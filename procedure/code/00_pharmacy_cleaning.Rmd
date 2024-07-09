@@ -1,0 +1,88 @@
+---
+title: "pharmacies raw data cleaning"
+output: html_document
+date: "2024-01-25"
+---
+
+```{r setup, include=FALSE}
+library(tidycensus)
+library(tidyverse)
+library(dplyr)
+library(sf)
+library(lubridate)
+```
+
+
+```{r}
+pharmacies <- read_csv("pharmacies_raw.csv") 
+
+# Replace "closed" with -1 for later analysis
+pharmacies_closed <- pharmacies%>%
+  mutate(sat_open = replace(sat_open, sat_open == 'Closed',-1),
+         sat_close = replace(sat_close, sat_close == 'Closed',-1),
+         sun_open = replace(sun_open, sun_open == 'Closed',-1),
+         sun_close = replace(sun_close, sun_close == 'Closed',-1))
+
+# Combine all department store and chain grocery store pharmacies with pharmacy chains like CVS, as these had more similar staffing models. Had to aggregate since sample size was too small for each type individually. Hospital / clinic and independent pharmacies were aggregated as they had similar staffing models. The DF 'staff_interpolation' below summarizes the average staffing for chain vs independent pharmacies on each day.   
+staff_interpolation <- pharmacies_closed%>%
+  mutate(type = ifelse(type %in% c("department", "grocery"), "chain", type),
+         type = ifelse(type %in% c("hospital"), "independent", type),
+         sat_pharm = ifelse(sat_close == -1, NA, sat_pharm),
+         sat_tech = ifelse(sat_close == -1, NA, sat_tech),
+         sun_pharm = ifelse(sun_close == -1, NA, sun_pharm),
+         sun_tech = ifelse(sun_close == -1, NA, sun_tech))%>%
+  group_by(type)%>%
+  summarise_all(mean, na.rm = TRUE)%>%
+  select(type, week_pharm,week_tech,sat_pharm,sat_tech,sun_pharm,sun_tech)
+
+#Select all chain pharmacies and replace the missing staffing values with averages of collected staffing for these pharmacy types (averaged above in staff_interpolation)
+pharmacies_staff_chain <- pharmacies_closed%>%
+  mutate(type = ifelse(type %in% c("department", "grocery"), "chain", type))%>%
+  filter(type %in% 'chain')%>%
+  mutate_at(vars(week_pharm, sat_pharm, sat_tech, sun_pharm, sun_tech), ~replace_na(., 1))%>%
+  mutate_at(vars(week_tech), ~replace_na(., 2))
+  
+#Select all independent pharmacies (including hospital) and replace the missing staffing values with averages of collected staffing levels for these pharmacy types (averaged above)
+pharmacies_staff_ind <- pharmacies_closed%>%
+  mutate(type = ifelse(type %in% c("hospital"), "independent", type))%>%
+  filter(type %in% 'independent')%>%
+  mutate_at(vars(week_pharm, sat_tech, sun_tech), ~replace_na(., 2))%>%
+  mutate_at(vars(sat_pharm, sun_pharm), ~replace_na(., 1))%>%
+  mutate_at(vars(week_tech), ~replace_na(., 4))
+
+# Recombine pharmacy data
+pharmacies_staff <- bind_rows(pharmacies_staff_chain, pharmacies_staff_ind)
+
+# Convert time strings for operational hours to numbers on the 24-hour clock. Half hour times converted to 0.5. I.e. 09:00:00 will be converted to 9, and 09:30:00 will be converted to 9.5. 
+
+pharmacies_updated <- pharmacies_staff %>%
+  mutate(across(c(week_open, week_close, sat_open, sat_close, sun_open, sun_close),
+                ~ as.numeric(format(as.POSIXct(., format = "%H:%M:%S"), "%H")) +
+                  as.numeric(format(as.POSIXct(., format = "%H:%M:%S"), "%M")) / 60))%>%
+  replace_na(list(week_open = -1, week_close = -1, sat_open = -1, sat_close = -1, sun_open = -1, sun_close = -1))
+         
+
+# Select data frame without staffing to be uploaded to GitHub public folder
+
+pharm_df <- pharmacies_updated%>%
+  select(-week_pharm, -week_tech, -sat_pharm, -sat_tech, -sun_pharm, -sun_tech)
+
+  #Both of the 24 hour pharmacies (NH45 ,and MA38) are shown with open and close hours as 0. Manually change close hours to 24 to work for the analysis. 
+
+# Select data frame with just staffing (private) to uploaded to private folder in GitHUb, then merged via pharmID
+
+pharm_staffing_df <- pharmacies_updated%>%
+  select(pharmid,week_pharm, week_tech, sat_pharm, sat_tech, sun_pharm, sun_tech)
+
+# Manually change 15 weekday technicians for Pharmacy VT 7 to 7 technicians. See full process / explanation in report. 
+pharm_staffing_df[155, 3] = 7
+
+```
+
+```{r}
+# Export Data
+setwd("~/Desktop")
+write_csv(pharm_df, "pharmacies_df.csv") # This CSV is then imported into QGIS and exported as a .gpkg file. 
+write_csv(pharm_staffing_df, "pharm_staffing.csv")
+```
+

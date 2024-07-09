@@ -20,18 +20,48 @@ options(tigris_use_cache = TRUE)
 
 ```{r}
 # Set Census API Key, retrieve your own from online and input below
-census_api_key("...", install = TRUE)
+census_api_key("...", install = TRUE, overwrite = TRUE)
 ```
 
 ```{r}
-# Retrieve data from 2020 Decennial Census on total population of county subdivisions in VT. Contains geographic data through geometry setting below:
-pop20 <- get_decennial(
+# Retrieve data from 2020 Decennial Census on total population of county subdivisions in VT, NY, NH, and MA. Contains geographic data through geometry setting below:
+
+pop20vt <- get_decennial(
   geography = "county subdivision",
   state = "50",
   variables = "P1_001N",
   geometry = TRUE,
   year = 2020
 )
+
+pop20ma <- get_decennial(
+  geography = "county subdivision",
+  state = "25",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+pop20ny <- get_decennial(
+  geography = "county subdivision",
+  state = "36",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+pop20nh <- get_decennial(
+  geography = "county subdivision",
+  state = "33",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+# Merge all population data for the respective states together
+
+all_pop20 <- pop20vt%>%
+  bind_rows(pop20nh, pop20ny,pop20ma)
 
 # Use to view Census and ACS 5-year variables
 
@@ -58,8 +88,8 @@ elderly_bytown <- age20%>%
   summarize(elderly_pop = sum(estimate))
 
 # Join the total population dataset with the age dataset, create a column for % elderly, and modify the GEOID to include the state, county, and town FIPS codes so they can be joined to other population data in later analysis. Clean and reorder data. Change CRS to VT state plane EPSG 6589.
-total_population_data <- pop20%>%
-  inner_join(elderly_bytown, by = "GEOID")%>%
+total_population_data <- all_pop20%>%
+  full_join(elderly_bytown, by = "GEOID")%>%
   rename(total_pop = value,
          subdivision_name = NAME)%>%
   mutate( pct_elderly = ((elderly_pop / total_pop)*100))%>%
@@ -68,6 +98,20 @@ total_population_data <- pop20%>%
   select(!variable)%>%
   st_transform(geometry, crs = st_crs(6589))
 
+pop_multipolygon <- st_cast(total_population_data, "MULTIPOLYGON")
+  
+   
+# VT Data. Same as above without other states. 
+
+# vt_population_data <- pop20vt%>%
+#   full_join(elderly_bytown, by = "GEOID")%>%
+#   rename(total_pop = value,
+#          subdivision_name = NAME)%>%
+#   mutate( pct_elderly = ((elderly_pop / total_pop)*100))%>%
+#   separate(GEOID, into = c("fips_state", "fips_county","fips_subdivision"), sep = c(2,5), remove = FALSE)%>%
+#   relocate(geometry, .after = pct_elderly)%>%
+#   select(!variable)%>%
+#   st_transform(geometry, crs = st_crs(6589))
 
 ```
 
@@ -76,6 +120,7 @@ total_population_data <- pop20%>%
 setwd("~/Desktop")
 write_csv(census_vars, "tidycensus_variables.csv")
 write_csv(acs_vars, "tidyacs_variables.csv")
-write_csv(total_population_data, "tidycensus_alldata.csv")
+write_csv(total_population_data, "tidycensus_population.csv")
+st_write(total_population_data, "tidycensus_population.gpkg", append = FALSE)
 ```
 
