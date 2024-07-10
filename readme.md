@@ -78,7 +78,7 @@ The data, procedures, and results of this repository are outlined in three table
 Important local **documents** include:
 - Pre-analysis plan: [docs/report/analysis_plan.pdf](docs/report/analysis_plan.pdf)
 - Presentation: [docs/presentation/SR_AAG_2024.pptx](docs/presentation/SR_AAG_2024.pptx)
-- Study report: [docs/report/analysis_report.pdf](docs/report/analysis_report.pdf) and [docs/index.html](docs/index.html)
+- Study report: [docs/report/analysis_report.pdf](docs/report/analysis_report.pdf) and [https://hegsrr.github.io/OR-VT-Pharmacy/](https://hegsrr.github.io/OR-VT-Pharmacy/)
 - Manuscript: (in progress) [docs/manuscript/manuscript.pdf](docs/manuscript/manuscript.pdf)
 
 #### Compendium reference

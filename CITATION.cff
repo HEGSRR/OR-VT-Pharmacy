@@ -1,28 +1,31 @@
 cff-version: 1.2.0
-message: "If you use this template, please cite it as below."
 authors:
-- family-names: "Kedron"
-  given-names: "Peter"
-  orcid: "https://orcid.org/0000-0002-1093-3416"
+- family-names: "Roubin"
+  given-names: "Samuel"
 - family-names: "Holler"
   given-names: "Joseph"
   orcid: "https://orcid.org/0000-0002-2381-2699"
-title: "Template for Reproducible and Replicable Research in Human-Environment and Geographical Sciences"
+- family-names: "Kedron"
+  given-names: "Peter"
+  orcid: "https://orcid.org/0000-0002-1093-3416"
+title: "Spatio-Temporal Accessibility of Pharmacy Care in Vermont, USA"
 version: 0.1
-doi: 10.17605/OSF.IO/5FGMC
+doi: 10.17605/OSF.IO/BCQ9S
 date-released: 2021-08-22
-url: "https://github.com/HEGSRR/HEGSRR-Template"
+url: "https://doi.org/10.17605/OSF.IO/BCQ9S"
 license: BSD 3-Clause
 preferred-citation:
   type: generic
   authors:
-  - family-names: "Kedron"
-    given-names: "Peter"
-    orcid: "https://orcid.org/0000-0002-1093-3416"
+  - family-names: "Roubin"
+    given-names: "Samuel"
   - family-names: "Holler"
     given-names: "Joseph"
     orcid: "https://orcid.org/0000-0002-2381-2699"
-  title: "Template for Reproducible and Replicable Research in Human-Environment and Geographical Sciences"
-  doi: 10.17605/OSF.IO/W29MQ
-  year: 2021
-  url: "https://github.com/HEGSRR/HEGSRR-Template"
+  - family-names: "Kedron"
+    given-names: "Peter"
+    orcid: "https://orcid.org/0000-0002-1093-3416"
+  title: "Spatio-Temporal Accessibility of Pharmacy Care in Vermont, USA"
+  doi: 10.17605/OSF.IO/BCQ9S
+  year: 2024
+  url: "https://doi.org/10.17605/OSF.IO/BCQ9S"
