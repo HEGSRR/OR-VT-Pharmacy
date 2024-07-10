@@ -30,8 +30,8 @@ This study adapts and extends the methodology used in Kang et al.'s (2020) "Rapi
   - Medicine and Health Sciences: Public Health: Health Services Research
   - Social and Behavioral Sciences: Geography: Geographic Information Sciences
   - Social and Behavioral Sciences: Geography: Human Geography
-- `Date created`: 9/18/2023
-- `Date modified`: 1/11/2024
+- `Date created`: 18-Sept-2023
+- `Date modified`: 9-July-2024
 - `Spatial Coverage`: The state of Vermont and areas within 10-miles of the Vermont border (MA, NY, NH). Canada is excluded.
 - `Spatial Resolution`: Vermont municipalities. These units are roughly the same size as census tracts, but they represent politically meaningful geographic units.
 - `Spatial Reference System`: EPSG 6589
