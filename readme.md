@@ -31,12 +31,12 @@ This study adapts and extends the methodology used in Kang et al.'s (2020) "Rapi
   - Social and Behavioral Sciences: Geography: Geographic Information Sciences
   - Social and Behavioral Sciences: Geography: Human Geography
 - `Date created`: 18-Sept-2023
-- `Date modified`: 9-July-2024
+- `Date modified`: 11-Oct-2024
 - `Spatial Coverage`: The state of Vermont and areas within 10-miles of the Vermont border (MA, NY, NH). Canada is excluded.
 - `Spatial Resolution`: Vermont municipalities. These units are roughly the same size as census tracts, but they represent politically meaningful geographic units.
 - `Spatial Reference System`: EPSG 6589
 - `Temporal Coverage`: Data was collected in October, November, and December of 2023. The temporal extent is not explicitly determined. Pharmacies have been asked to provide their staffing levels over the period of roughly a month. The results from the study will be theoretically based on a single point in time in the fall of 2023. This is a one time measurement, and the study does not investigate change over time.
-- `Temporal Resolution`: The highest temporal resolution of this study is one hour. Many results and figures aggregate the temporal resolution into days of the week or common operating hours. 
+- `Temporal Resolution`: The highest temporal resolution of this study is one hour. Many results and figures aggregate the temporal resolution into days of the week or common operating hours.
 - `Funding Name`: National Science Foundation Directorate for Social, Behavioral and Economic Sciences
 - `Funding Title`: Transforming theory-building and STEM education through reproductions and replications in the geographical sciences
 - `Award info URI`: <https://www.nsf.gov/awardsearch/showAward?AWD_ID=2049837>
@@ -79,7 +79,6 @@ Important local **documents** include:
 - Pre-analysis plan: [docs/report/analysis_plan.pdf](docs/report/analysis_plan.pdf)
 - Presentation: [docs/presentation/SR_AAG_2024.pptx](docs/presentation/SR_AAG_2024.pptx)
 - Study report: [docs/report/analysis_report.pdf](docs/report/analysis_report.pdf) and [https://hegsrr.github.io/OR-VT-Pharmacy/](https://hegsrr.github.io/OR-VT-Pharmacy/)
-- Manuscript: (in progress) [docs/manuscript/manuscript.pdf](docs/manuscript/manuscript.pdf)
 
 #### Compendium reference
 
