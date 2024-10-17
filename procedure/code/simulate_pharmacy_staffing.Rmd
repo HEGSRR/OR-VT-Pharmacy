@@ -1,0 +1,256 @@
+---
+title: "Simulate pharmacy staff data"
+author: "Jiahua Chen"
+date: "2024-09-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sf)
+library(dplyr)
+library(nngeo)
+library(ggplot2)
+library(tidycensus)
+library(data.table)
+library(MASS)
+library(rstanarm)
+```
+
+## Read data
+
+```{r data}
+pharm_raw <- read.csv("data/pharmacies_raw.csv") 
+pharm_inter <- read.csv("data/staffing_interpolated.csv")
+pharm <- pharm_raw %>% 
+  dplyr::select(-c(week_pharm,week_tech,sat_pharm,sat_tech,sun_pharm,sun_tech)) %>% 
+  left_join(pharm_inter, by = "pharmid") %>% 
+  st_as_sf(coords = c("lon","lat"), crs = st_crs(4326))
+bur <- read_sf("data/Metro_VM_dissolved/DissolvedFeatures.shp")
+```
+
+```{r}
+ggplot(data = pharm) +
+  geom_sf(aes(color = as.numeric(week_tech)), size = 2) + 
+  scale_color_gradient2(low = "yellow", high = "red", midpoint = 3) +
+  theme_minimal()
+```
+
+## Creating explaining variables
+### population
+#### pull census population
+```{r eval=FALSE}
+states <- c("VT","NY","NH","MA")
+
+for (state in states) {
+  print(paste("Processing:", state))
+  pop_data <- get_decennial(
+    geography = "cbg",
+    variables = "P1_001N",  # Total population
+    year = 2020,
+    state = state,
+    geometry = TRUE
+  )
+  if (exists("pop_data")) {
+    saveRDS(pop_data, file = paste0(getwd(), "/cbg_data_", state, ".rds"))
+    print(paste("Data saved for", state))
+  } else {
+    print(paste("No data retrieved for", state))
+  }
+}
+
+```
+
+#### join population to pharmacies
+
+```{r}
+results <- list()
+
+for (state in states) {
+  file_name <- paste0(getwd(), "/data/cbg_data_", state, ".rds")
+  cbg_data <- readRDS(file_name)
+  
+  if (st_crs(pharm) != st_crs(cbg_data)) {
+    pharm <- st_transform(pharm, crs = st_crs(cbg_data))
+  }
+  joined_data <- st_join(pharm, left = FALSE, cbg_data["value"])
+
+  results[[state]] <- joined_data
+  cat(state, "processing completed \n")
+}
+
+pharm_cbg_pop <- rbindlist(results,fill = TRUE)
+
+pharm_cbg_pop <- pharm_cbg_pop %>% 
+  rename(cbg_pop = value)
+
+pharm$cbg_pop <- pharm_cbg_pop$cbg_pop
+
+```
+
+
+### distance to nearest pharmacy
+
+```{r}
+# Find the index of the nearest point for each point
+nearest_index <- st_nn(pharm, pharm, k = 2, progress = FALSE) 
+
+# Extract the geometries of the nearest neighbors
+nearest_points <- st_geometry(pharm)[unlist(lapply(nearest_index, `[`, 2))]
+
+# Calculate the distance to the nearest neighbor
+pharm$dist_nn <- st_distance(st_geometry(pharm), nearest_points, by_element = TRUE)
+
+```
+
+### number of nearby pharmacy
+```{r}
+# project to UTM 18N
+pharm_utm <- st_transform(pharm, crs = 32618)
+
+# Set the radius for counting nearby pharmacies (e.g., 1 km = 1000 meters)
+radius_1 <- 1000
+radius_2 <- 2000
+
+# Function to count pharmacies within the radius of each pharmacy
+count_nearby_pharmacies <- function(pharmacy, pharmacies_sf, radius) {
+  # Create a buffer around the current pharmacy
+  buffer <- st_buffer(pharmacy, dist = radius)
+  
+  # Count how many pharmacies fall within the buffer (excluding the pharmacy itself)
+  sum(st_intersects(pharmacies_sf, buffer, sparse = FALSE)) - 1
+}
+
+# Apply the function to each pharmacy to calculate the number of nearby pharmacies
+pharm$num_neig <- sapply(1:nrow(pharm_utm), function(i) {
+  count_nearby_pharmacies(pharm_utm[i, ], pharm_utm, radius_1)
+})
+
+pharm$num_neig_2 <- sapply(1:nrow(pharm_utm), function(i) {
+  count_nearby_pharmacies(pharm_utm[i, ], pharm_utm, radius_2)
+})
+```
+
+
+### binary var within Burlington
+
+```{r}
+# project to UTM 18N
+pharm_utm <- st_transform(pharm, crs = 32618)
+bur_utm <- st_transform(bur, crs = 32618)
+
+pharm$within_bur <- as.factor(ifelse(lengths(st_within(pharm_utm, bur_utm)) > 0, "yes", "no"))
+```
+
+### prep data for regression
+```{r}
+pharm_prep <- pharm %>% 
+  mutate (type = as.factor(type)) %>% 
+  st_drop_geometry()
+```
+
+
+## OLS - stepwise variable selection
+### weekdays
+```{r eval=FALSE}
+weekdays_p_full <- lm(week_pharm ~  cbg_pop + type + num_neig + num_neig_2 + dist_nn + within_bur, data = pharm_prep)
+weekdays_t_full <- lm(week_tech ~  cbg_pop + type + num_neig + num_neig_2 + dist_nn + within_bur, data = pharm_prep)
+weekdays_p <- step(weekdays_p_full, direction = "both")
+weekdays_t <- step(weekdays_t_full, direction = "both")
+
+summary(weekdays_p)
+summary(weekdays_t)
+```
+
+### Saturday
+```{r eval=FALSE}
+sat_p_full <- lm(sat_pharm ~  cbg_pop + type + num_neig + num_neig_2 + dist_nn + within_bur, data = pharm_prep)
+sat_t_full <- lm(sat_tech ~  cbg_pop + type + num_neig + num_neig_2 + dist_nn + within_bur, data = pharm_prep)
+saturday_p <- step(sat_p_full, direction = "both")
+saturday_t <- step(sat_t_full, direction = "both")
+
+summary(saturday_p)
+summary(saturday_t)
+```
+
+### Sunday
+```{r eval=FALSE}
+sun_p_full <- lm(sun_pharm ~  cbg_pop + type + num_neig + num_neig_2 + dist_nn + within_bur, data = pharm_prep)
+sun_t_full <- lm(sun_tech ~  cbg_pop + type + num_neig + num_neig_2 + dist_nn + within_bur, data = pharm_prep)
+sunday_p <- step(sun_p_full, direction = "both")
+sunday_t <- step(sun_t_full, direction = "both")
+
+summary(sunday_p)
+summary(sunday_t)
+```
+
+## Bayesian
+### weekdays
+```{r}
+set.seed(123)
+# Fit Poisson regressions for pharmacist and technician staffing. We need separate regression for each count variable to use Poisson, adding gives 0.5 because technicians are counted as 1/2 a pharmacist.
+fit_pharm_week <- stan_glm(week_pharm ~ type + within_bur, data = pharm_prep, family = poisson(link = "log"), refresh = 0)
+fit_tech_week <- stan_glm(week_tech ~ type + num_neig, data = pharm_prep, family = poisson(link = "log"),  refresh = 0)
+
+# Simulate pharmacist and technician staffing levels. Now divide the technician estimate by 2 to bring it back to the 1/2 pharmacist scale
+pred_pharm_week <- posterior_predict(fit_pharm_week, newdata = pharm_sim)
+pred_tech_week <- posterior_predict(fit_tech_week, newdata = pharm_sim) / 2
+
+# Calculate staffing estimate for each pharmacy using means of 4000 sims and bring the estimate back to the original 0.5 increments
+sim_staff_week <- colMeans(pred_pharm_week) + colMeans(pred_tech_week)
+sim_staff_week_b <- round(sim_staff_week * 2) / 2
+```
+
+### Saturday
+```{r}
+set.seed(123)
+# Fit Poisson regressions for pharmacist and technician staffing. We need separate regression for each count variable to use Poisson, adding gives 0.5 because technicians are counted as 1/2 a pharmacist.
+fit_pharm_sat <- stan_glm(sat_pharm ~ type + cbg_pop, data = pharm_prep, family = poisson(link = "log"), refresh = 0)
+fit_tech_sat <- stan_glm(sat_tech ~  type + cbg_pop, data = pharm_prep, family = poisson(link = "log"),  refresh = 0)
+
+# Simulate pharmacist and technician staffing levels. Now divide the technician estimate by 2 to bring it back to the 1/2 pharmacist scale
+pred_pharm_sat <- posterior_predict(fit_pharm_sat, newdata = pharm_sim)
+pred_tech_sat <- posterior_predict(fit_tech_sat, newdata = pharm_sim) / 2
+
+# Calculate staffing estimate for each pharmacy using means of 4000 sims and bring the estimate back to the original 0.5 increments
+sim_staff_sat <- colMeans(pred_pharm_sat) + colMeans(pred_tech_sat)
+sim_staff_sat_b <- round(sim_staff_sat* 2) / 2
+```
+
+### Sunday
+```{r}
+set.seed(123)
+# Fit Poisson regressions for pharmacist and technician staffing. We need separate regression for each count variable to use Poisson, adding gives 0.5 because technicians are counted as 1/2 a pharmacist.
+fit_pharm_sun <- stan_glm(sun_pharm ~ type + num_neig, data = pharm_prep, family = poisson(link = "log"), refresh = 0)
+fit_tech_sun <- stan_glm(sun_tech ~ type + num_neig + within_bur, data = pharm_prep, family = poisson(link = "log"),  refresh = 0)
+
+# Simulate pharmacist and technician staffing levels. Now divide the technician estimate by 2 to bring it back to the 1/2 pharmacist scale
+pred_pharm_sun <- posterior_predict(fit_pharm_sun, newdata = pharm_sim)
+pred_tech_sun <- posterior_predict(fit_tech_sun, newdata = pharm_sim) / 2
+
+# Calculate staffing estimate for each pharmacy using means of 4000 sims and bring the estimate back to the original 0.5 increments
+sim_staff_sun <- colMeans(pred_pharm_sun) + colMeans(pred_tech_sun)
+sim_staff_sun_b <- round(sim_staff_sun * 2) / 2
+
+```
+
+
+### output
+```{r}
+## use work hours to force 0
+pharm_raw %>% 
+  mutate(week_sim_staff = sim_staff_week_b,
+         sat_sim_staff = if_else(sat_open == "Closed", 0, sim_staff_sat_b),
+         sun_sim_staff = if_else(sun_open == "Closed", 0, sim_staff_sun_b)) %>% 
+  dplyr::select(-c(week_pharm,week_tech,sat_pharm,sat_tech,sun_pharm,sun_tech)) %>% 
+  write.csv("output/pharm_simulated.csv")
+
+pharm_raw %>% 
+  mutate(week_sim_staff = sim_staff_week_b,
+         sat_sim_staff = if_else(sat_open == "Closed", 0, sim_staff_sat_b),
+         sun_sim_staff = if_else(sun_open == "Closed", 0, sim_staff_sun_b)) %>% 
+  dplyr::select(-c(week_pharm,week_tech,sat_pharm,sat_tech,sun_pharm,sun_tech)) %>% 
+  st_as_sf(coords = c("lon","lat"), crs = 4326) %>% 
+  st_write("output/pharm_simulated.shp")
+```
+
