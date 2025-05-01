@@ -47,7 +47,7 @@ This study adapts and extends the methodology used in Kang et al.'s (2020) "Rapi
 - `OSF Project`: Roubin, S., & Holler, J. (2024, January 11). Spatio-Temporal Accessibility of Pharmacy Care in Vermont, USA. <https://doi.org/10.17605/OSF.IO/BCQ9S>
 - `Pre-analysis Registration`: <https://doi.org/10.17605/OSF.IO/BCQ9S>
 - `Post-analysis Report Registration`: <https://doi.org/10.17605/OSF.IO/MBC2W>
-- `Preprint`:
+- `Preprint`: <https://doi.org/10.1101/2025.04.29.25326678>
 - `Conference Presentation`: 2024 American Association of Geographers Annual Meeting [slides](docs/presentation/SR_AAG_2024.pptx) and [abstract](https://aag.secure-platform.com/aag2024/solicitations/57/sessiongallery/7796/application/30826)
 - `Publication`:
 - `Prior Studies`:
