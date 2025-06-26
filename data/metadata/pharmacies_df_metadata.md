@@ -1,7 +1,7 @@
 - `Title`: All non-staffing pharmacy data (pharmacies_df.gpkg)
 - `Abstract`: Same as pharmacies_raw.csv without staffing data. 
 - `Spatial Coverage`: Vermont and ten miles within in Vermont state border, encompassing parts of New York, Massachusetts, and New Hampshire. Canada was excluded.
-- `Temporal Coverage`: Data was collected over the course of a couple of months, but it theoretically represents a an average or typical week in the fall or early winter of 2023.
+- `Temporal Coverage`: Data was collected over the course of a couple of months, but it theoretically represents a an average or typical week in the fall or early winter of 2023. Pharmacies in operation as of December 2023 are included in the initial data. Records were updated with new closures and openings as of June 25, 2025.
 - `Temporal Resolution`: The temporal resolution of service is hours. 
 - `Lineage`: Data extracted from pharmacies_raw.csv using the code 00_pharmacy_cleaning.Rmd . This R markdown file converted operational hours originally reported on the 24-hour clock to integers for easier analysis and extracted all non-staffing data for analysis. The exported .csv was then converted into a .gpkg file in QGIS. View process in procedure/code/00_pharmacy_cleaning.Rmd 
 - `Distribution`: This dataset will be made public and downloadable on a GitHub repository
@@ -24,6 +24,9 @@
 | sat_close| closing time on Saturdays | Integer |
 | sun_open| opening time on Sundays | Integer | 
 | sun_close| closing time on Sundays | Integer |
+| closed | date the pharmacy closed | Date |
+| opened | date the pharmacy opened | Date |
+| source | information on closing or opening | Text URL |
 
   - `Accuracy`: We have confidence in the quality of the data on hours of operations for VT pharmacies since we collected the data by surveying all pharmacies. Hours of operations for non-VT pharmacies were pulled from online. The spatial accuracy of the dataset is further confirmed as we ensured that the point coordinates for the pharmacies were within the building footprint polygon on the OSM map layer in QGIS. 
   - `Domain`:  The expected range of all of the pharmacy operational hours is from roughly 7 am to 10 pm. 
