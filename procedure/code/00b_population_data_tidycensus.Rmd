@@ -1,0 +1,161 @@
+---
+title: "Retrieving US Census Bureau Data (Population Dataset) "
+output: html_document
+date: "2024-01-16"
+---
+
+```{r environment-setup, include = FALSE}
+# record all the packages you are using here
+# this includes any calls to library(), require(),
+# and double colons such as here::i_am()
+packages <- c("tidyverse", "here", "tidycensus", "sf")
+
+# force all conflicts to become errors
+# if you load dplyr and use filter(), R has to guess whether you mean dplyr::filter() or stats::filter()
+# the conflicted package forces you to be explicit about this
+# disable at your own peril
+# https://conflicted.r-lib.org/
+require(conflicted)
+
+# load and install required packages
+# https://groundhogr.com/
+if (!require(groundhog)) {
+  install.packages("groundhog")
+  require(groundhog)
+}
+
+# this date will be used to determine the versions of R and your packages
+# it is best practice to keep R and its packages up to date
+groundhog.day <- "2025-06-01"
+
+# this replaces any library() or require() calls
+groundhog.library(packages, groundhog.day)
+# you may need to install a correct version of R
+# you may need to respond OK in the console to permit groundhog to install packages
+# you may need to restart R and rerun this code to load installed packages
+# In RStudio, restart r with Session -> Restart Session
+
+# record the R processing environment
+# alternatively, use devtools::session_info() for better results
+writeLines(
+  capture.output(sessionInfo()),
+  here("procedure", "environment", paste0("r-environment-", Sys.Date(), ".txt"))
+)
+
+# save package citations
+knitr::write_bib(c(packages, "base"), file = here("software.bib"))
+
+# set up default knitr parameters
+# https://yihui.org/knitr/options/
+knitr::opts_chunk$set(
+  echo = FALSE, # Show outputs, but not code. Change to TRUE to show code as well
+  fig.retina = 4,
+  fig.width = 8,
+  fig.path = paste0(here("results", "figures"), "/")
+)
+```
+
+
+
+```{r}
+# Retrieve data from 2020 Decennial Census on total population of county subdivisions in VT, NY, NH, and MA. Contains geographic data through geometry setting below:
+
+pop20vt <- get_decennial(
+  geography = "county subdivision",
+  state = "50",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+pop20ma <- get_decennial(
+  geography = "county subdivision",
+  state = "25",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+pop20ny <- get_decennial(
+  geography = "county subdivision",
+  state = "36",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+pop20nh <- get_decennial(
+  geography = "county subdivision",
+  state = "33",
+  variables = "P1_001N",
+  geometry = TRUE,
+  year = 2020
+)
+
+# Merge all population data for the respective states together
+
+all_pop20 <- pop20vt%>%
+  bind_rows(pop20nh, pop20ny,pop20ma)
+```
+
+```{r}
+
+# Use to view Census and ACS 5-year variables
+census_series <- summary_files(2020)
+census_pl_vars <- load_variables(2020, "pl")
+census_dhc_vars <- load_variables(2020, "dhc")
+
+acs_vars <- load_variables(2023, "acs5")
+
+# Establish list of variables necessary to pull total population over 65. Includes age groups 65 and older for both males and females, the groups are as follows: 65 and 66, 67 to 69, 70 to 74, 75 to 79, 80 to 84, 84 and over. Variables were found using the acs_vars df above. 
+
+vars_of_interest <- c("B01001_020","B01001_021","B01001_022","B01001_023","B01001_024","B01001_025","B01001_044", "B01001_045", "B01001_046", "B01001_047", "B01001_048", "B01001_049")
+```
+
+
+
+```{r}
+# Retrieve data from the ACS 5-year for the above age groups 
+age20 <- get_acs(
+  geography = "county subdivision",
+  state = "50",
+  variables = vars_of_interest,
+  survey = "acs5",
+  year = 2022
+)
+
+# Create dataframe that creates a column for total number of people 65 and over (elderly) for each town GEOID
+elderly_bytown <- age20%>%
+  group_by(GEOID)%>%
+  summarize(elderly_pop = sum(estimate))
+
+# Join the total population dataset with the age dataset, create a column for % elderly, and modify the GEOID to include the state, county, and town FIPS codes so they can be joined to other population data in later analysis. Clean and reorder data. Change CRS to VT state plane EPSG 6589.
+total_population_data <- all_pop20%>%
+  full_join(elderly_bytown, by = "GEOID")%>%
+  rename(total_pop = value,
+         subdivision_name = NAME)%>%
+  mutate( pct_elderly = ((elderly_pop / total_pop)*100))%>%
+  separate(GEOID, into = c("fips_state", "fips_county","fips_subdivision"), sep = c(2,5), remove = FALSE)%>%
+  relocate(geometry, .after = pct_elderly)%>%
+  select(!variable)%>%
+  st_transform(geometry, crs = st_crs(6589))
+
+pop_multipolygon <- st_cast(total_population_data, "MULTIPOLYGON")
+```
+  
+   
+
+
+```{r}
+# Export Data
+setwd("~/Desktop")
+write_csv(census_vars, "tidycensus_variables.csv")
+write_csv(acs_vars, "tidyacs_variables.csv")
+write_csv(total_population_data, "tidycensus_population.csv")
+st_write(total_population_data, "tidycensus_population.gpkg", append = FALSE)
+```
+
+
+```{r}
+
+

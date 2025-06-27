@@ -10,11 +10,15 @@ library(tidyverse)
 library(dplyr)
 library(sf)
 library(lubridate)
+library(here)
 ```
 
 
+With permission of authors, raw pharmacy data can be downloaded from https://osf.io/download/mprxe/
+
 ```{r}
-pharmacies <- read_csv("pharmacies_raw.csv") 
+pharm_file <- here("data", "raw", "private", "pharmacies_raw.csv")
+pharmacies <- read_csv(pharm_file) 
 
 # Replace "closed" with -1 for later analysis
 pharmacies_closed <- pharmacies%>%
@@ -22,6 +26,10 @@ pharmacies_closed <- pharmacies%>%
          sat_close = replace(sat_close, sat_close == 'Closed',-1),
          sun_open = replace(sun_open, sun_open == 'Closed',-1),
          sun_close = replace(sun_close, sun_close == 'Closed',-1))
+```
+
+
+```{r}
 
 # Combine all department store and chain grocery store pharmacies with pharmacy chains like CVS, as these had more similar staffing models. Had to aggregate since sample size was too small for each type individually. Hospital / clinic and independent pharmacies were aggregated as they had similar staffing models. The DF 'staff_interpolation' below summarizes the average staffing for chain vs independent pharmacies on each day.   
 staff_interpolation <- pharmacies_closed%>%
@@ -35,6 +43,10 @@ staff_interpolation <- pharmacies_closed%>%
   summarise_all(mean, na.rm = TRUE)%>%
   select(type, week_pharm,week_tech,sat_pharm,sat_tech,sun_pharm,sun_tech)
 
+staff_interpolation |> write_csv(here("data", "derived", "public", "staff_interpolation.csv"))
+```
+
+```{r}
 #Select all chain pharmacies and replace the missing staffing values with averages of collected staffing for these pharmacy types (averaged above in staff_interpolation)
 pharmacies_staff_chain <- pharmacies_closed%>%
   mutate(type = ifelse(type %in% c("department", "grocery"), "chain", type))%>%
@@ -82,7 +94,11 @@ pharm_staffing_df[155, 3] = 7
 ```{r}
 # Export Data
 setwd("~/Desktop")
-write_csv(pharm_df, "pharmacies_df.csv") # This CSV is then imported into QGIS and exported as a .gpkg file. 
-write_csv(pharm_staffing_df, "pharm_staffing.csv")
+write_csv(pharm_df, 
+          here("data", "derived", "private", "pharmacies_df.csv")) 
+# This CSV is then imported into QGIS and exported as a .gpkg file. 
+write_csv(pharm_staffing_df, 
+          here("data", "derived", "private", "pharm_staffing.csv") )
 ```
 
+Three pharmacies newly opened in Vermont during revision of this study were added to the data manually with interpolated values.
