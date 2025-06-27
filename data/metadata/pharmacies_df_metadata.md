@@ -24,8 +24,8 @@
 | sat_close| closing time on Saturdays | Integer |
 | sun_open| opening time on Sundays | Integer | 
 | sun_close| closing time on Sundays | Integer |
-| closed | date the pharmacy closed | Date |
-| opened | date the pharmacy opened | Date |
+| status | 'open' if the pharmacy has been open; 'closed' if the pharmacy closed'; 'opened' if the pharmacy is newly opened | Text |
+| status_date | date the pharmacy closed or opened | Date |
 | source | information on closing or opening | Text URL |
 
   - `Accuracy`: We have confidence in the quality of the data on hours of operations for VT pharmacies since we collected the data by surveying all pharmacies. Hours of operations for non-VT pharmacies were pulled from online. The spatial accuracy of the dataset is further confirmed as we ensured that the point coordinates for the pharmacies were within the building footprint polygon on the OSM map layer in QGIS. 
