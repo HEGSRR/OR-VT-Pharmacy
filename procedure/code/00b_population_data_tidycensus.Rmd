@@ -8,7 +8,7 @@ date: "2024-01-16"
 # record all the packages you are using here
 # this includes any calls to library(), require(),
 # and double colons such as here::i_am()
-packages <- c("tidyverse", "here", "tidycensus", "sf")
+packages <- c("tidyverse", "here", "tidycensus", "sf", "tigris")
 
 # force all conflicts to become errors
 # if you load dplyr and use filter(), R has to guess whether you mean dplyr::filter() or stats::filter()
@@ -26,7 +26,7 @@ if (!require(groundhog)) {
 
 # this date will be used to determine the versions of R and your packages
 # it is best practice to keep R and its packages up to date
-groundhog.day <- "2025-06-01"
+groundhog.day <- "2025-04-01"
 
 # this replaces any library() or require() calls
 groundhog.library(packages, groundhog.day)
@@ -34,7 +34,10 @@ groundhog.library(packages, groundhog.day)
 # you may need to respond OK in the console to permit groundhog to install packages
 # you may need to restart R and rerun this code to load installed packages
 # In RStudio, restart r with Session -> Restart Session
+```
 
+
+```{r}
 # record the R processing environment
 # alternatively, use devtools::session_info() for better results
 writeLines(
@@ -53,6 +56,82 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.path = paste0(here("results", "figures"), "/")
 )
+
+options(tigris_use_cache = TRUE)
+```
+
+
+```{r}
+counties <- counties(state = c("VT", "NH", "MA", "NY"))
+```
+
+
+```{r}
+# select counties within 40 mile buffer of Vermont
+countiesVT <- counties |> 
+  dplyr::filter(STATEFP == "50") |> 
+  select(geometry) |> 
+  st_buffer(64373)
+
+bufferROI <- counties |> 
+  dplyr::filter(STATEFP != "50") |> 
+  st_join(countiesVT, join=st_intersects, left=FALSE) |> 
+  select(STATEFP, COUNTYFP, GEOID) |> 
+  st_drop_geometry() |> 
+  distinct()
+```
+
+
+```{r}
+vars2020 <- load_variables(2020, "dhc")
+myvars <- c("P1_001N", 
+            "P11_001N", "P11_005N", 
+            "P12_020N", "P12_021N", "P12_022N", "P12_023N", "P12_024N", "P12_025N",
+            "P12_044N", "P12_045N", "P12_046N", "P12_047N", "P12_048N", "P12_049N")
+
+```
+
+
+```{r}
+vtBlocks <- get_decennial(
+  geography = "block",
+  state = "50",
+  geometry = TRUE,
+  year = 2020,
+  sumfile = "dhc",
+  variables = myvars,
+  output = "wide"
+)
+
+st_write(vtBlocks, here("data", "raw", "public", "population", "blocks50.gpkg"))
+```
+
+```{r}
+states <- bufferROI |> select(STATEFP) |> distinct()
+
+
+
+for (s in states$STATEFP) {
+  roiCounties <- bufferROI |> 
+    dplyr::filter(STATEFP == s) |> 
+    select(COUNTYFP)
+
+  countyResults <- c()  
+  for (c in roiCounties) {
+    curBlocks <- get_decennial(geography = "block",
+                              state = s,
+                              county = c,
+                              geometry = TRUE,
+                              year = 2020,
+                              sumfile = "dhc",
+                              variables = myvars,
+                              output = "wide")
+    countyResults <- countyResults |> append(c(curBlocks))
+  }
+  countyResults <- bind_rows(countyResults)
+  st_write(countyResults, here("data", "raw", "public", "population", paste0("blocks", s, ".gpkg")))
+}
+
 ```
 
 
@@ -97,6 +176,8 @@ pop20nh <- get_decennial(
 all_pop20 <- pop20vt%>%
   bind_rows(pop20nh, pop20ny,pop20ma)
 ```
+
+
 
 ```{r}
 
