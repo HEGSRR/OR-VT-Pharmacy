@@ -201,8 +201,9 @@ process_census <- function(df) {
 Process county subdivisions and save
 
 ```{r}
+subdivisions <- st_read(here("data", "raw", "public", "population", "county_subdivisions.gpkg"))
 subdivisions_derived <- process_census(subdivisions)
-st_write(subdivisions, 
+st_write(subdivisions_derived, 
          here("data", "derived", "public", "population", "county_subdivisions.gpkg"),
          append = FALSE)
 ```
