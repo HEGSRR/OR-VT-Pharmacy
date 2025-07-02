@@ -203,7 +203,7 @@ Process county subdivisions and save
 ```{r}
 subdivisions_derived <- process_census(subdivisions)
 st_write(subdivisions, 
-         here("data", "raw", "public", "population", "county_subdivisions.gpkg"),
+         here("data", "derived", "public", "population", "county_subdivisions.gpkg"),
          append = FALSE)
 ```
 
