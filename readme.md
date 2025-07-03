@@ -80,10 +80,14 @@ Important local **documents** include:
 - Presentation: [docs/presentation/SR_AAG_2024.pptx](docs/presentation/SR_AAG_2024.pptx)
 - Study report: [docs/report/analysis_report.pdf](docs/report/analysis_report.pdf) and [https://hegsrr.github.io/OR-VT-Pharmacy/](https://hegsrr.github.io/OR-VT-Pharmacy/)
 - Alternative reports:
+  - [Original study parameters](https://hegsrr.github.io/OR-VT-Pharmacy/report/original_parameters.html)
   - [Elderly Population](https://hegsrr.github.io/OR-VT-Pharmacy/report/elderly_population.html)
   - [Technicians as 0.7](https://hegsrr.github.io/OR-VT-Pharmacy/report/technicians_pt7.html)
   - [Technicians as 0.3](https://hegsrr.github.io/OR-VT-Pharmacy/report/technicians_pt3.html)
   - [June 2025 updated data](https://hegsrr.github.io/OR-VT-Pharmacy/report/june_2025.html)
+  - [Additional distance bands (5)](https://hegsrr.github.io/OR-VT-Pharmacy/report/granular_distance.html)
+  - [Census blocks](https://hegsrr.github.io/OR-VT-Pharmacy/report/census_blocks.html)
+  - [Additional distance bands and census blocks](https://hegsrr.github.io/OR-VT-Pharmacy/report/granular_distance_census_blocks.html)
 
 #### Compendium reference
 
