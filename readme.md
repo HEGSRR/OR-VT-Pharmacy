@@ -79,6 +79,11 @@ Important local **documents** include:
 - Pre-analysis plan: [docs/report/analysis_plan.pdf](docs/report/analysis_plan.pdf)
 - Presentation: [docs/presentation/SR_AAG_2024.pptx](docs/presentation/SR_AAG_2024.pptx)
 - Study report: [docs/report/analysis_report.pdf](docs/report/analysis_report.pdf) and [https://hegsrr.github.io/OR-VT-Pharmacy/](https://hegsrr.github.io/OR-VT-Pharmacy/)
+- Alternative reports:
+  - [Elderly Population](https://hegsrr.github.io/OR-VT-Pharmacy/report/elderly_population.html)
+  - [Technicians as 0.7](https://hegsrr.github.io/OR-VT-Pharmacy/report/technicians_pt7.html)
+  - [Technicians as 0.3](https://hegsrr.github.io/OR-VT-Pharmacy/report/technicians_pt3.html)
+  - [June 2025 updated data](https://hegsrr.github.io/OR-VT-Pharmacy/report/june_2025.html)
 
 #### Compendium reference
 
