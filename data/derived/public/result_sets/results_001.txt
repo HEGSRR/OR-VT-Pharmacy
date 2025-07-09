@@ -1,0 +1,9 @@
+Result Set ID: 001
+Beta: 262
+Discretization: min travel time
+Distances: [600, 1200, 1800] (seconds) [10, 20, 30] (minutes)
+Weights: [1, 0.68, 0.22]
+Time series: 2023
+Pharmacy technician value: pt5 (0.5)
+Demand population: total_pop
+Geographic level of aggregation: county_subdivision
