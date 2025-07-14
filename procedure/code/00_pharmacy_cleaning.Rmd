@@ -93,10 +93,9 @@ pharm_staffing_df[155, 3] = 7
 
 ```{r}
 # Export Data
-setwd("~/Desktop")
 write_csv(pharm_df, 
           here("data", "derived", "private", "pharmacies_df.csv")) 
-# This CSV is then imported into QGIS and exported as a .gpkg file. 
+# This CSV was then imported into QGIS and exported as a .gpkg file. 
 write_csv(pharm_staffing_df, 
           here("data", "derived", "private", "pharm_staffing.csv") )
 ```

@@ -254,3 +254,4 @@ pharm_raw %>%
   st_write("output/pharm_simulated.shp")
 ```
 
+Note that three Vermont pharmacies were added to simulate change through 2025, using interpolated values.

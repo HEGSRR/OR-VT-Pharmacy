@@ -1,7 +1,10 @@
 path,name,purpose
 environment,readme.md,description of computational notebook
 protocol,survey_instrument,Survey instrument for pharmacy hours and staffing
-code,00_population_data_tidycensus.Rmd,R script for downloading census data with tidycensus package
-code,00_road_network.ipynb,Python script for downloading OpenStreetMap road data and building and saving a network graph
-code,00_pharmacy_cleaning.Rmd,R script for cleaning and interpolating pharmacy staffing data; this R script reads in the raw data and creates one staffing file and one file with the rest of the relevant data.
-code,01_Pharmacy_Accessibility.ipynb,computational notebook for research analysis and report
+code,00_pharmacy_cleaning.Rmd,Clean pharmacy data and interpolate missing pharmacy staffing data
+code,01_population_data_tidycensus.Rmd,Download census data with tidycensus package and calculate totals
+code,02_simulate_pharmacy_staffing.Rmd,Generate simulated pharmacy staffing data
+code,00_road_network.ipynb,"Download OpenStreetMap road data, then build and save a network graph"
+code,01_Pharmacy_Accessibility.ipynb,Main research analysis and report
+code,02_Study_Variations.ipynb,Generate results with alternative study parameters
+code,03_Compare_Results.ipynb,Compare two sets of alternative study results
