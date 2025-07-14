@@ -27,9 +27,3 @@ The results linked above are discussed in the supplementary materials of the man
 | Weekday | Saturday | Sunday |
 | :--: | :--: | :--: | 
 | ![Weekday Access](animate/Week.gif) | ![Saturday Access](animate/Saturday.gif) | ![Weekday Access](animate/Sunday.gif) |
-
-![Weekday Access](animate/Week.gif)
-
-![Saturday Access](animate/Saturday.gif)
-
-![Weekday Access](animate/Sunday.gif)
