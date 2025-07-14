@@ -21,3 +21,15 @@ Additionally, any two sets of study results can be compared with the `03_Compare
 - [Additional distance bands and census blocks](https://hegsrr.github.io/OR-VT-Pharmacy/report/granular_distance_census_blocks.html) and [comparison to original study parameters](https://hegsrr.github.io/OR-VT-Pharmacy/report/compare_granularity.html)
 
 The results linked above are discussed in the supplementary materials of the manuscript.
+
+## Animations
+
+| Weekday | Saturday | Sunday |
+| :--: | :--: | :--: | 
+| ![Weekday Access](animate/Week.gif) | ![Saturday Access](animate/Saturday.gif) | ![Weekday Access](animate/Sunday.gif) |
+
+![Weekday Access](animate/Week.gif)
+
+![Saturday Access](animate/Saturday.gif)
+
+![Weekday Access](animate/Sunday.gif)
