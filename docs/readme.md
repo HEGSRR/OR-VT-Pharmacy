@@ -24,14 +24,12 @@ The results linked above are discussed in the supplementary materials of the man
 
 ## Animations
 
-Weekly Access
+| Weekday | Saturday | Sunday |
+| :--: | :--: | :--: | 
+| ![Weekday Access](animate/Week.gif) | ![Saturday Access](animate/Saturday.gif) | ![Weekday Access](animate/Sunday.gif) |
 
 ![Weekday Access](animate/Week.gif)
 
-Saturday Access
-
 ![Saturday Access](animate/Saturday.gif)
-
-Sunday Access
 
 ![Weekday Access](animate/Sunday.gif)
