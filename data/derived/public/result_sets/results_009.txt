@@ -1,4 +1,4 @@
-Result Set ID: 006
+Result Set ID: 009
 Beta: 262
 Discretization: mean travel time
 Distances: [600, 1200, 1800] (seconds) [10, 20, 30] (minutes)
