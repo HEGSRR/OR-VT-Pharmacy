@@ -19,6 +19,7 @@ Additionally, any two sets of study results can be compared with the `03_Compare
 - [Additional distance bands](https://hegsrr.github.io/OR-VT-Pharmacy/report/granular_distance.html)
 - [Census blocks](https://hegsrr.github.io/OR-VT-Pharmacy/report/census_blocks.html)
 - [Additional distance bands and census blocks](https://hegsrr.github.io/OR-VT-Pharmacy/report/granular_distance_census_blocks.html) and [comparison to original study parameters](https://hegsrr.github.io/OR-VT-Pharmacy/report/compare_granularity.html)
+- [Simulated staffing data](https://hegsrr.github.io/OR-VT-Pharmacy/report/simulated_staffing.html)
 
 The results linked above are discussed in the supplementary materials of the manuscript.
 
