@@ -2,6 +2,7 @@
 
 - [Original study report](https://hegsrr.github.io/OR-VT-Pharmacy/report.html) (generated with the `01_Pharmacy_Accessibility.ipynb` notebook)
 - [Pre-registered analysis plan](https://hegsrr.github.io/OR-VT-Pharmacy/report/analysis_plan.pdf)
+- [Supplementary materials report](https://hegsrr.github.io/OR-VT-Pharmacy/report/supplementary_report.pdf)
 
 ## Alternative study versions
 

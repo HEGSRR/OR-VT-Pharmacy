@@ -79,7 +79,9 @@ Important local **documents** include:
 - Pre-analysis plan: [docs/report/analysis_plan.pdf](docs/report/analysis_plan.pdf)
 - Presentation: [docs/presentation/SR_AAG_2024.pptx](docs/presentation/SR_AAG_2024.pptx)
 - Study report: [docs/report/analysis_report.pdf](docs/report/analysis_report.pdf) and [https://hegsrr.github.io/OR-VT-Pharmacy/report.html](https://hegsrr.github.io/OR-VT-Pharmacy/report.html)
+- Supplementary materials report: [docs/report/supplementary_report.pdf](docs/report/supplementary_report.pdf)
 - Alternative reports: [https://hegsrr.github.io/OR-VT-Pharmacy/](https://hegsrr.github.io/OR-VT-Pharmacy/)
+
 
 #### Compendium reference
 
