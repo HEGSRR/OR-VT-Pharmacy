@@ -1,4 +1,4 @@
-GitHub Repository: [HEGSRR/OR-VT-Pharmacy]https://github.com/HEGSRR/OR-VT-Pharmacy)
+GitHub Repository: [HEGSRR/OR-VT-Pharmacy](https://github.com/HEGSRR/OR-VT-Pharmacy)
 
 # Study Reports
 
