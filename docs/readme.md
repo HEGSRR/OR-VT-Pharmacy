@@ -1,3 +1,4 @@
+Publication DOI: [10.1186/s12913-025-13653-1](https://doi.org/10.1186/s12913-025-13653-1)
 GitHub Repository: [HEGSRR/OR-VT-Pharmacy](https://github.com/HEGSRR/OR-VT-Pharmacy)
 
 # Study Reports
